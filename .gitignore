@@ -1,6 +1,4 @@
-"1.jpg"
-"2.jpg"
-"3.jpg"
-"4.jpg"
-"5.jpg"
-"6.jpg"
+*.jpg
+removetxt3.py
+removetxt4.py
+removetxt5.py
