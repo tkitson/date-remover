@@ -7,7 +7,6 @@ import os
 
 pipeline = keras_ocr.pipeline.Pipeline()
 
-remove_list = ["September", "september", "1993"]
 
 def midpoint(x1, y1, x2, y2):
     x_mid = int((x1 + x2)/2)
@@ -39,24 +38,27 @@ def inpaint_text(img, remove_list, pipeline):
 
     return(img)
 
+papers_folder = "/Users/thomaskitson/Documents/newsguessr/papers"
+subfolders = [f.path for f in os.scandir(papers_folder) if f.is_dir()]
 
-image_paths = ["1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg"]
-
-# # Convert to grayscale image
-# gray_img = cv2.cvtColor(image_paths, cv2.COLOR_BGR2GRAY)
-
-# # Converting grey image to binary image by Thresholding
-# thresh_img = cv2.threshold(gray_img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-
-folder_path = "/Users/thomaskitson/Documents/newsguessr/1993"
-
-for img_path in image_paths:
-    img = cv2.imread(img_path)
-    height, width, _ = img.shape
-    top_25 = img[0:int(height*0.25), 0:width]
-    top_25 = inpaint_text(top_25, remove_list, pipeline)
-    bottom_75 = img[int(height*0.25):height, 0:width]
-    img = np.concatenate((top_25, bottom_75), axis=0)
-    img = cv2.resize(img, (int(img.shape[1]*0.5), int(img.shape[0]*0.5)))
-    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    cv2.imwrite(os.path.join(folder_path, img_path), img_rgb, [cv2.IMWRITE_JPEG_QUALITY, 10])
+for folder in subfolders:
+    new_folder = os.path.join(folder, "new")
+    if not os.path.exists(new_folder):
+        os.makedirs(new_folder)
+    image_paths = [f.path for f in os.scandir(folder) if f.is_file() and f.name.endswith('.jpg') and f.name !='.DS_Store']
+    base_name = os.path.basename(folder)
+    remove_list = base_name.split(" ")
+    print(remove_list)
+    for img_path in image_paths:
+        print(img_path)
+        img = cv2.imread(img_path)
+        height, width, _ = img.shape
+        top_25 = img[0:int(height*0.25), 0:width]
+        top_25 = inpaint_text(top_25, remove_list, pipeline)
+        bottom_75 = img[int(height*0.25):height, 0:width]
+        img = np.concatenate((top_25, bottom_75), axis=0)
+        img = cv2.resize(img, (int(img.shape[1]*0.5), int(img.shape[0]*0.5)))
+        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        new_path = os.path.join(new_folder, os.path.basename(img_path))
+        cv2.imwrite(new_path, img_rgb, [cv2.IMWRITE_JPEG_QUALITY, 10])
+        # cv2.imwrite(os.path.join(folder, img_path), img_rgb, [cv2.IMWRITE_JPEG_QUALITY, 10])
