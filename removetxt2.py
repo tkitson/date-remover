@@ -32,7 +32,7 @@ def inpaint_text(img, remove_list, pipeline):
 
            thickness = int(math.sqrt( (x2 - x1)**2 + (y2 - y1)**2 ))
 
-           cv2.line(mask, (int(x_mid0 / 1.3), y_mid0), (int(x_mid1 * 1.3), y_mi1), 255,
+           cv2.line(mask, (int(x_mid0 / 5 ), y_mid0), (int(x_mid1 * 5 ), y_mi1), 255,
            thickness)
            img = cv2.inpaint(img, mask, 7, cv2.INPAINT_NS)
 
